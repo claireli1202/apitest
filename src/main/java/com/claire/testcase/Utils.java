@@ -8,36 +8,70 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class Utils {
 	
 	private static final String regexFunc = "\\$\\{([\\w]+)\\(([\\w,\\s\\$\\.]*)\\)\\}";
-	public static Object findVarValue(String varName) {
-		//第一步 先取全局里的
-		//第二步 取本case里的，同名的覆盖
+	private static final String regexVariable = "^\\$([\\w]+)";
+	public static Object findVarValue(String varName, Map<String, Object> varValues) {
+//		查找是否有匹配的varName
+		for (String name : varValues.keySet()) {
+			if(varName.equals(name)) {
+				return varValues.get(name);
+			}
+		}
 		return null;
 	}
 	
-	public static Object invokeFunc(FuncObj fn) {
+	
+	public static Object invokeFunc(FuncObj fn, Map<String,Object> varValues) throws Exception {
+		System.out.println("begin call invokeFunc");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(varValues);
+        System.out.println(json);
+        
 		//call findVarValue if there's any params need to be replaced by variable
-		return null;
+		List<String> paramsRuntime = new ArrayList<String>();
+		
+		List<String> params = fn.getFuncParams();
+		for(String p : params) {
+			Object varValue = p;
+			Pattern pattern = Pattern.compile(regexVariable);
+			Matcher matcher = pattern.matcher(p);
+			if(matcher.find()){
+				String varName = matcher.group(1);
+				varValue = findVarValue(varName,varValues);
+				if (varValue == null) {
+//					TODO:throw exception
+					String ex = String.format("函数%s: 参数(%s)未找到定义", fn.getFuncName(), varName);
+					throw new Exception(ex);
+				}
+			}
+			paramsRuntime.add(varValue.toString());
+		}
+		
+		//call the function to calculate the variables
+		//TODO 
+		String val = "";
+		try {
+			val = funcInvoke("com.claire.testcase.Funcs", fn.getFuncName(), paramsRuntime);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return val;
 		
 	}
 	
-	public static void prepareVariablesByFunc(Map<String,FuncObj> funcFormula,Map<String,Object> varsByFunc) {
-		for(String varName : funcFormula.keySet()){
-			FuncObj varFn = funcFormula.get(varName);
-			Object varValue = Utils.invokeFunc(varFn);
-			if(varValue==null){
-				//TODO: throw exception
-			}
-			varsByFunc.put(varName, varValue);
-		}
-	}
 
 	/* variables可能存在两种形式，1.固定值；2.需要函数计算
-	 * 固定值的variable，赋值给varsFixed
-	 * 需要函数计算的variable，赋值给varsByFunc*/
-	public static void prepareVariables(Map<String,Object> variables,Map<String, Object> varsFixed,Map<String, Object> varsByFunc) {
+	 * 固定值的variable，赋值给varsValue
+	 * 需要函数计算的variable，赋值给varsFuncFormula
+	 * 运行是计算好之后再赋值给varsValue*/
+	public static void prepareVariables(Map<String,Object> variables, Map<String, Object> varsValue, Map<String, FuncObj> varsFuncFormula) {
 		
 		for(String name : variables.keySet()) {
 			Object obj = variables.get(name);
@@ -58,24 +92,15 @@ public class Utils {
 					}
 					System.out.println();
 					
-					//call the function to calculate the variables
-					//TODO 
-					String val;
-					try {
-						val = funcInvoke("com.claire.testcase.Funcs", funcName, paramList);
-						varsByFunc.put(name, val);
-						System.out.printf("[varsByFunc]name:%s; value:%s\n", name, val);
-						continue;
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.exit(1);
-					}
+//					generate the funcObj
+					FuncObj fObj = new FuncObj(funcName, paramList);
+					varsFuncFormula.put(name, fObj);
+					continue;
 				}
 			}
 			
-			varsFixed.put(name, obj);
-			System.out.println("[varsFixed]name: " + name + ";" + " value: " + obj.toString());
+			varsValue.put(name, obj);
+			System.out.println("[varsValue]name: " + name + ";" + " value: " + obj.toString());
 		}
 		
 	}
@@ -120,8 +145,6 @@ public class Utils {
 						throw new Exception(ex);
 					}
 				}
-				System.out.println(m);
-				System.out.println(params);
 				
 				//开始调用方法
 				Object obj = c.newInstance();
@@ -143,6 +166,9 @@ public class Utils {
 			e.printStackTrace();
 		}
 
+		if(!found) {
+			throw new Exception("方法未找到！");
+		}
 		return retVal;
 	}	
 }

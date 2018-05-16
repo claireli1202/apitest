@@ -1,10 +1,11 @@
 package com.claire.tools;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Map;
-
-import org.ho.yaml.Yaml;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 
@@ -14,9 +15,13 @@ public class YamlUtil {
 		
 		try {
 			File f = new File(path);
-			yCase = Yaml.loadType(f,YamlCase.class);
-//			System.out.println(yCase);
-		} catch (FileNotFoundException e) {
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+			yCase = mapper.readValue(f, YamlCase.class);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(yCase);
+            System.out.println(json);
+            
+		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
@@ -24,17 +29,17 @@ public class YamlUtil {
 	}
 	
 //	path: "C:\\Users\\claire\\workspace\\APITest\\src\\test\\resources\\yaml\\test1.yaml"
-	public static void dump(String path) {
-		YamlCase yCase = new YamlCase();
-//		yCase.setContent();
-		
-		File output = new File(path);
-		try {
-			Yaml.dump(yCase, output, true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void dump(String path) {
+//		YamlCase yCase = new YamlCase();
+////		yCase.setContent();
+//		
+//		File output = new File(path);
+//		try {
+//			Yaml.dump(yCase, output, true);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	public static void replaceVariable(Map<String,Object> params,Map<String,Object> variablesValue){
 		if (params != null){

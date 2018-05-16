@@ -10,8 +10,8 @@ config:
     variables:
         # device_sn0: "${gen_random_string()}"
         # device_sn: "${gen_random_string(15, true, 0.1f, foo bar)}"
-        device_sn: "${gen_random_string(15)}"
-        device_sn2: 2
+        device_sn: ${gen_random_string($aa)}
+        aa: 2
         device_sn3: "hello world"
     # request:
     #     base_url: http://127.0.0.1:5000
