@@ -2,7 +2,7 @@ package com.claire.tools;
 
 public class YamlCase {	
 	private IConfig config;
-	private Case[] cases;
+	private TestCase[] cases;
 		
 	public IConfig getConfig() {
 		return config;
@@ -10,13 +10,14 @@ public class YamlCase {
 	public void setConfig(IConfig config) {
 		this.config = config;
 	}
-
-	public Case[] getCases() {
+	public TestCase[] getCases() {
 		return cases;
 	}
-	public void setCases(Case[] cases) {
+	public void setCases(TestCase[] cases) {
 		this.cases = cases;
 	}
+
+
 
 //	public String toString()  
 //    {

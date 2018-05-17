@@ -70,7 +70,7 @@ public class Utils {
 	/* variables可能存在两种形式，1.固定值；2.需要函数计算
 	 * 固定值的variable，赋值给varsValue
 	 * 需要函数计算的variable，赋值给varsFuncFormula
-	 * 运行是计算好之后再赋值给varsValue*/
+	 */
 	public static void prepareVariables(Map<String,Object> variables, Map<String, Object> varsValue, Map<String, FuncObj> varsFuncFormula) {
 		
 		for(String name : variables.keySet()) {
@@ -105,6 +105,53 @@ public class Utils {
 		
 	}
 
+	/* params可能存在三种形式，1.固定值；2.需要函数计算；3.需要变量替换
+	 * 固定值的variable，赋值给paramsValue
+	 * 需要函数计算的variable，赋值给paramsFuncFormula
+	 * 需要变量替换的，取出变量名，保存到paramVarFormula
+	 */
+	public static void prepareVariables2(Map<String,Object> input, Map<String, Object> value, Map<String, FuncObj> funcFormula, Map<String, String> varFormula) {
+		
+		for(String name : input.keySet()) {
+			Object obj = input.get(name);
+			if(obj instanceof String) {
+				String str = (String)obj;
+				Pattern pattern = Pattern.compile(regexFunc);
+				Matcher matcher = pattern.matcher(str);
+				
+				if(matcher.find()){
+					String funcName = matcher.group(1);
+					String[] params = matcher.group(2).split(",");
+					
+					List<String> paramList = new ArrayList<String>();
+					System.out.printf("[varsByFunc]name: %s; funcName: %s; funcParamList: \n", name, funcName);
+					for (int i=0; i< params.length; i++){
+						System.out.printf("%s\t", params[i].trim());
+						paramList.add(params[i].trim());
+					}
+					System.out.println();
+					
+//					generate the funcObj
+					FuncObj fObj = new FuncObj(funcName, paramList);
+					funcFormula.put(name, fObj);
+					continue;
+				}
+
+				pattern = Pattern.compile(regexVariable);
+				matcher = pattern.matcher(str);
+				if(matcher.find()){
+					String varName = matcher.group(1);
+					varFormula.put(name, varName);
+					continue;
+				}
+			}
+			
+			value.put(name, obj);
+			System.out.println("[varsValue]name: " + name + ";" + " value: " + obj.toString());
+		}
+		
+	}
+	
 	public static String funcInvoke(String className, String method, List<String> args) throws Exception {
 		String retVal = "";	
 		boolean found = false; 

@@ -5,67 +5,68 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Test {
-	//variables extracted from testcase
-	//var_name -> xpath/jsonpath 表达式
-	private Map<String,String> extractFormula;
+import com.claire.tools.TestCase;
 
-	//var4: local fixed 代表本case固定定义的值
+public class Test {
+	private String URL = "";
+	private String Method = "";
+	private String name = "";
+	private Map<String,Object> varsMerged = null;
+	
+	//var1: 本case固定定义的Variable值
 	//eg: local_var4_1, local_var4_2
 	//var_name -> var_value
-	private Map<String, Object> varsFixed;
+	//固定值 没有表达式
+	private Map<String,Object> varsValue = new HashMap<String, Object>();
 	
-	//var5: local with function calc 的需要函数计算的值
-	//eg: local_var5
-	//var_name -> func_obj
-//	private Map<String, FuncObj> funcFormula;
-	private Map<String, Object> varsByFunc;
+	//var2: 本case里需要函数计算的Variable，存表达式，在运行是调用函数计算，存入varsValue
+	//eg: device_sn
+	//var_name -> FuncObj 表达式prepareVariables2
+	private Map<String,FuncObj> varsFuncFormula = new HashMap<String, FuncObj>();
+		
 	
-	
-	private String URL = "";
-	private String Method = "";	
-	// params指发包时候的包体param
-	
-	//类型A： params 固定的 
-	//eg：param1,param2
 	//param_name -> param_value
-	private Map<String, Object> paramFixed;
+	private Map<String, Object> paramValue = new HashMap<String, Object>();
 	
-	//params replace with variables(var1 + var2 + var3 + var4 + var5) 
-	//eg: param3,param4,param5,param6,param7
 	// param_name -> var_name
-	private Map<String, String> paramByVars;
+	private Map<String, String> paramVarFormula = new HashMap<String, String>();
 	
-	//params replace with function calc 
-	//eg: param8
-	private Map<String, FuncObj> paramByFunc;
+	// param_name -> FuncObj
+	private Map<String, FuncObj> paramFuncFormula = new HashMap<String, FuncObj>();
 	
-	private Map<String, Object> headerFixed;
-	private Map<String, String> headerByVars;
-	private Map<String, FuncObj> headerByFunc;
+	//request
+	private Map<String, Object> headerValue = new HashMap<String, Object>();
+	private Map<String,FuncObj> headerFuncFormula = new HashMap<String, FuncObj>();
 	
+	//extract: 
+	//variables extracted from testcase
+	//var_name -> xpath/jsonpath 表达式
+	private Map<String,String> extractFormula = null;
 	
 	public String getURL() {
 		return this.URL;
 	}
 	
-	public void setVarsByFunc(Map<String, FuncObj> funcFormula) {
-		this.varsByFunc.clear();
-		//计算本case local的变量
-		Utils.prepareVariablesByFunc(funcFormula, varsByFunc);
-//		for(String varName : this.funcFormula.keySet()){
-//			FuncObj varFn = this.funcFormula.get(varName);
-//			Object varValue = Utils.invokeFunc(varFn);
-//			if(varValue==null){
-//				//TODO: throw exception
-//			}
-//			this.varsByFunc.put(varName, varValue);
-//		}
-	}
+//	public void setVarsByFunc(Map<String, FuncObj> funcFormula) {
+//		this.varsByFunc.clear();
+//		
+//		Map<String,Object> caseVariables = yCase.getConfig().getVariables();
+////      处理config中variables的参数替换
+//		Utils.prepareVariables(caseVariables,varsValue,varsFuncFormula);
+//		
+//		//计算本case local的变量
+//		Utils.prepareVariablesByFunc(funcFormula, varsByFunc);
+////		for(String varName : this.funcFormula.keySet()){
+////			FuncObj varFn = this.funcFormula.get(varName);
+////			Object varValue = Utils.invokeFunc(varFn);
+////			if(varValue==null){
+////				//TODO: throw exception
+////			}
+////			this.varsByFunc.put(varName, varValue);
+////		}
+//	}
 	
-	public Map<String, Object> getVarsByFunc() {
-		return varsByFunc;
-	}
+	
 	
 	public boolean validate(Object response) {
 		//校验结果
@@ -85,50 +86,86 @@ public class Test {
 		return values;
 	}
 	
-	
-	public Map<String, Object> generateRuntimeParams() {
-		//整合paramFixed + paramByVars + paramByFunc
-		//变成一个Map<String, Object>返回
-		//copy paramFixed and create new Map params
-		Map<String,Object> params = new HashMap<String,Object>(paramFixed);
+	public void generateRuntimeVariables(Map<String, Object> globalVars){
+		//计算本case的vars，与globalVars整合，保存到varsMerged
 		
-		//loop the Map paramByVars and replace the variables
-		for(String paramName : paramByVars.keySet()){
-			String varName = paramByVars.get(paramName);
-			Object varValue = Utils.findVarValue(varName);
-			if(varValue==null){
-				//TODO: throw exception
-			}
-			params.put(paramName, varValue);
-		}
-
-		for(String paramName : paramByFunc.keySet()){
-			FuncObj varFn= paramByFunc.get(paramName);
-			Object varValue = Utils.invokeFunc(varFn);
-			if(varValue==null){
-				//TODO: throw exception
-			}
-			params.put(paramName, varValue);
-		}	
-		
-		return params;
 	}
 	
-	public Map<String, Object> generateRuntimeHeader() {
-		//整合headerFixed + headerByVars + headerByFunc
-		//变成一个Map<String, Object>返回
+	public String generateRuntimeURL() {
+		//从varsMerged找到匹配的值，替换URL中的变量
+		return "";
+	}
+	
+	public Map<String, Object> generateRuntimeHeaders(){
+//		for(String paramName : paramByFunc.keySet()){
+//		FuncObj varFn= paramByFunc.get(paramName);
+//		Object varValue = Utils.invokeFunc(varFn);
+//		if(varValue==null){
+//			//TODO: throw exception
+//		}
+//		params.put(paramName, varValue);
+//	}	
+		
+		
 		return null;
 	}
 	
-//	private Object findVarValue(String varName) {
-//		//第一步 先取全局里的
-//		//第二步 取本case里的，同名的覆盖
-//		return null;
-//	}
-//	
-//	private Object invokeFunc(FuncObj fn) {
-//		//call findVarValue if there's any params need to be replaced by variable
-//		return null;
+	
+	public Map<String, Object> generateRuntimeParams() {
+//		//整合paramFixed + paramByVars + paramByFunc
+//		//变成一个Map<String, Object>返回
+//		//copy paramFixed and create new Map params
+//		Map<String,Object> params = new HashMap<String,Object>(paramFixed);
 //		
-//	}
+//		//loop the Map paramByVars and replace the variables
+//		for(String paramName : paramByVars.keySet()){
+//			String varName = paramByVars.get(paramName);
+//			Object varValue = Utils.findVarValue(varName);
+//			if(varValue==null){
+//				//TODO: throw exception
+//			}
+//			params.put(paramName, varValue);
+//		}
+//
+//		for(String paramName : paramByFunc.keySet()){
+//			FuncObj varFn= paramByFunc.get(paramName);
+//			Object varValue = Utils.invokeFunc(varFn);
+//			if(varValue==null){
+//				//TODO: throw exception
+//			}
+//			params.put(paramName, varValue);
+//		}	
+//		
+//		return params;
+		
+		return null;
+	}
+	
+	
+	public void load(TestCase tc) {
+		this.name = tc.getName();
+		this.URL = tc.getRequest().getUrl();
+		this.Method = tc.getRequest().getMethod();
+		
+//		get the variables in tc
+		Map<String,Object> tcVariables = tc.getVariables();
+//      处理tc中variables的参数替换
+		Utils.prepareVariables(tcVariables, varsValue, varsFuncFormula);
+		
+        //处理tc.request.headers中variables的参数替换
+		Map<String,Object> tcHeaders = tc.getRequest().getHeaders();
+		Utils.prepareVariables(tcHeaders,headerValue,headerFuncFormula);
+		
+		//处理tc.request.params,分别保存
+		Map<String,Object> tcParams = tc.getRequest().getParams();
+		Utils.prepareVariables2(tcParams, paramValue, paramFuncFormula, paramVarFormula);
+		
+		//处理tc中的extract
+		extractFormula = new HashMap<String, String>(tc.getExtract()); 
+		
+		
+	}
+	
+	
+	
 }

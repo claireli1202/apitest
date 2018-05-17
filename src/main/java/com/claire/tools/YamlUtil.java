@@ -17,9 +17,9 @@ public class YamlUtil {
 			File f = new File(path);
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 			yCase = mapper.readValue(f, YamlCase.class);
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(yCase);
-            System.out.println(json);
+//			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//            String json = gson.toJson(yCase);
+//            System.out.println(json);
             
 		} catch (Exception e) {
 
@@ -72,48 +72,42 @@ public class YamlUtil {
 		
 	}	
 	
-/*	public static void main(String[] args){
-		
-		//dump
-		File f = new File("C:\\Users\\claire\\workspace\\APITest\\src\\test\\resources\\yaml\\output3.yaml");
-		YamlCase yCase = new YamlCase();
-		yCase.setBar(1);
-		yCase.setFoo("hello");
-		Config c = new Config();
-		c.setScheme("https");
-		yCase.setConfig(c);
-		
-		Case[] cases = new Case[2];
-		for (int i=0; i<2; i++){
-			cases[i] = new Case();
-			TestCase testCase = new TestCase();
-			testCase.setHost("www.jd.com");
-			testCase.setPath("/" + i);
-			cases[i].setTestCase(testCase);
-			
-		}
-		
-
-		yCase.setCases(cases);
-		
-		
-		try {
-			Yaml.dump(yCase, f, true);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		//load
-		try {
-			File f2 = new File("C:\\Users\\claire\\workspace\\APITest\\src\\test\\resources\\yaml\\test1.yaml");
-			YamlCase y = Yaml.loadType(f2, YamlCase.class);
-			System.out.println(y);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-	}
- 	*/
+//	public static void main(String[] args){
+//		
+////		//dump
+////		File f = new File("C:\\Users\\claire\\workspace\\APITest\\src\\test\\resources\\yaml\\output3.yaml");
+////		YamlCase yCase = new YamlCase();
+////		yCase.setBar(1);
+////		yCase.setFoo("hello");
+////		Config c = new Config();
+////		c.setScheme("https");
+////		yCase.setConfig(c);
+////		
+////		Case[] cases = new Case[2];
+////		for (int i=0; i<2; i++){
+////			cases[i] = new Case();
+////			TestCase testCase = new TestCase();
+////			testCase.setHost("www.jd.com");
+////			testCase.setPath("/" + i);
+////			cases[i].setTestCase(testCase);
+////			
+////		}
+////		
+////
+////		yCase.setCases(cases);
+////		
+////		
+////		try {
+////			Yaml.dump(yCase, f, true);
+////		} catch (FileNotFoundException e) {
+////			e.printStackTrace();
+////		}
+//		
+//		//load
+//		
+////		YamlUtil.load("/home/claire/work/eclipse-workspace/apitest/src/test/resource/yaml/testset1.yaml");
+//		
+//		
+//	}
+ 	
 }

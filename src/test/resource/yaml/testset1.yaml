@@ -10,42 +10,43 @@ config:
     variables:
         # device_sn0: "${gen_random_string()}"
         # device_sn: "${gen_random_string(15, true, 0.1f, foo bar)}"
-        device_sn: ${gen_random_string($aa)}
+        deviceSn: ${genRandomString($aa)}
         aa: 2
-        device_sn3: "hello world"
-    # request:
-    #     base_url: http://127.0.0.1:5000
-    #     headers:
-    #         device_sn: $device_sn
-# cases: 
-#   - 
-#     testCase: 
-#         name: get token
-#         variables:
-#             local_var4_1: 5
-#             local_var4_2: hello
-#             local_var5: ${my_funcS($user_agent, 2)}
-#         request:
-#             url: /api/get-token
-#             method: POST
-#             headers:
-#                 user_agent: $user_agent
-#                 os_platform: $os_platform
-#                 app_version: $app_version
-#             json:
-#                 param1: 6
-#                 param2: world
-#                 param3: $token
-#                 param4: $device_sn2
-#                 param5: $device_sn
-#                 param6: $local_var4_1
-#                 param7: $local_var5
-#                 param8: ${get_sign($user_agent, $device_sn, $os_platform, $app_version)}
-#         # validate:
-#         #     - {"check": "status_code", "comparator": "eq", "expect": 200}
-#         #     - {"check": "content.token", "comparator": "len_eq", "expect": 16}
-#         #     - eq: [status_code, 200]
-#         #     - eq: [headers.Content-Type, application/json]
-#         #     - eq: [content.success, True]
-#         extract:
-#             - token: content.token
+        deviceSn3: "hello world"
+    request:
+        baseUrl: http://127.0.0.1:5000
+        headers:
+            haa: ${genRandomString($aa)}
+            hbb: 3
+
+cases: 
+  - name: get token
+    variables:
+        local_var4_1: 5
+        local_var4_2: hello
+        local_var5: ${my_funcS($user_agent, 2)}
+    request:
+        url: /api/get-token
+        method: POST
+        headers:
+            user_agent: $user_agent
+            os_platform: $os_platform
+            app_version: $app_version
+        params:
+            param1: 6
+            param2: world
+            param3: $token
+            param4: $device_sn2
+            param5: $device_sn
+            param6: $local_var4_1
+            param7: $local_var5
+            param8: ${get_sign($user_agent, $device_sn, $os_platform, $app_version)}
+    # validate:
+    #     - {"check": "status_code", "comparator": "eq", "expect": 200}
+    #     - {"check": "content.token", "comparator": "len_eq", "expect": 16}
+    #     - eq: [status_code, 200]
+    #     - eq: [headers.Content-Type, application/json]
+    #     - eq: [content.success, True]
+    extract:
+        token: content.token
+        
