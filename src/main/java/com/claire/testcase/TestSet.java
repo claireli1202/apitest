@@ -37,13 +37,13 @@ public class TestSet {
 	private List<Test> tests = new ArrayList<Test>(); 
 
     public void Load(String path) {
-//		load the yaml testset to a YamlCase object
+		//load the yaml testset to a YamlCase object
 		YamlCase yCase = YamlUtil.load(path);
 	    
 	    name = yCase.getConfig().getName();
-//		get the variables in config
+		//get the variables in config
 		Map<String,Object> configVariables = yCase.getConfig().getVariables();
-//      处理config中variables的参数替换
+        //处理config中variables的参数替换
 		Utils.prepareVariables(configVariables,varsValue,varsFuncFormula);
 		
 		baseUrl = yCase.getConfig().getRequest().getBaseUrl();
@@ -70,7 +70,7 @@ public class TestSet {
 	}
 	
 	public void Run() {
-		//
+		//计算config中所有需要函数计算的variables, headers
 		for(String name : varsFuncFormula.keySet()) {
 			FuncObj fObj = varsFuncFormula.get(name);
 			try {
@@ -91,22 +91,29 @@ public class TestSet {
 		}
         
         for(Test t : tests) {
-        	
+        	t.generateRuntimeVariables(this.varsValue);
+        	try {
+				System.out.println(t.generateRuntimeURL());
+				System.out.println("runtime values:");
+		        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		        String json = gson.toJson(t.generateRuntimeHeaders());
+		        System.out.println(json);
+		        json = gson.toJson(t.generateRuntimeParams());
+		        System.out.println(json);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
-        
-        
-		System.out.println("global variables: ");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(this);
-        System.out.println(json);
-		
 	}
 	
 	
 	public static void main(String[] args) {
 		TestSet ts = new TestSet();
+		System.out.println("**************************Load************************");
 		ts.Load("/home/claire/work/eclipse-workspace/apitest/src/test/resource/yaml/testset1.yaml");
-//		ts.Run();
+		System.out.println("**************************Run************************");
+		ts.Run();
 		
 	}
 	

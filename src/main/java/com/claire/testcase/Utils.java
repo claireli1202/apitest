@@ -3,6 +3,7 @@ package com.claire.testcase;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,11 +28,6 @@ public class Utils {
 	
 	
 	public static Object invokeFunc(FuncObj fn, Map<String,Object> varValues) throws Exception {
-		System.out.println("begin call invokeFunc");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(varValues);
-        System.out.println(json);
-        
 		//call findVarValue if there's any params need to be replaced by variable
 		List<String> paramsRuntime = new ArrayList<String>();
 		
@@ -217,5 +213,20 @@ public class Utils {
 			throw new Exception("方法未找到！");
 		}
 		return retVal;
-	}	
+	}
+	
+	public static void calcFunc(HashMap<String, FuncObj> funcFormula, HashMap<String, Object> value) {
+		//计算config/case中所有需要函数计算的variables/headers，结果存入varsValue
+		for(String name : funcFormula.keySet()) {
+			FuncObj fObj = funcFormula.get(name);
+			try {
+				value.put(name, Utils.invokeFunc(fObj,value));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
+		
+	}
+	
 }

@@ -10,37 +10,36 @@ config:
     variables:
         # device_sn0: "${gen_random_string()}"
         # device_sn: "${gen_random_string(15, true, 0.1f, foo bar)}"
-        deviceSn: ${genRandomString($aa)}
-        aa: 2
-        deviceSn3: "hello world"
+        cVar1: ${genRandomString($cVar2)}
+        cVar2: "2"
+        cVar3: "hello world"
     request:
         baseUrl: http://127.0.0.1:5000
         headers:
-            haa: ${genRandomString($aa)}
-            hbb: 3
+            cHeader1: ${genRandomString($cVar2)}
+            cHeader2: 3
 
 cases: 
   - name: get token
     variables:
-        local_var4_1: 5
-        local_var4_2: hello
-        local_var5: ${my_funcS($user_agent, 2)}
+        lVar1: 5
+        lVar2: hello
+        lVar3: ${genRandomString($cVar2)}
     request:
-        url: /api/get-token
+        url: /api/users/$lVar1$cVar2/$cVar2/jh
         method: POST
         headers:
-            user_agent: $user_agent
-            os_platform: $os_platform
-            app_version: $app_version
+            user_agent: chrome
+            os_platform: $cVar2
+            app_version: $lVar2
+            hcc: ${genRandomString($cVar1)}
+            hdd: ${genRandomString($lVar3)}
         params:
             param1: 6
             param2: world
-            param3: $token
-            param4: $device_sn2
-            param5: $device_sn
-            param6: $local_var4_1
-            param7: $local_var5
-            param8: ${get_sign($user_agent, $device_sn, $os_platform, $app_version)}
+            param3: $cVar1
+            param4: $lVar1
+            param8: ${genRandomString($lVar3)}
     # validate:
     #     - {"check": "status_code", "comparator": "eq", "expect": 200}
     #     - {"check": "content.token", "comparator": "len_eq", "expect": 16}
